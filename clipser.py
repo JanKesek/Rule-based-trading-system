@@ -4,7 +4,7 @@ env=clips.Environment()
 
 class Clipser:
     def __init__(self,facts):
-        env.load("defrules.clp")
+        env.load("rulebased\defrules.clp")
         self.facts=facts
         self.decisions=[]
         self.index=0

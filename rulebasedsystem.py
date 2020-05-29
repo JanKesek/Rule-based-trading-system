@@ -1,8 +1,8 @@
-from simpleindicators import SimpleIndicators as SI
+from rulebased.simpleindicators import SimpleIndicators as SI
 import pickle
 import json
-from clipser import Clipser
-from dempsterschaffer import DempsterS
+from rulebased.clipser import Clipser
+from rulebased.dempsterschaffer import DempsterS
 si =None
 def set_data_for_si(data):
     global si
@@ -16,9 +16,9 @@ class RBS:
         #self.wbb=obj['wbb']
         self.groups=[]
         self.fuzzylimits={
-            "volumebig":50,
+            "volumebig":100,
             "pricebig":50,
-            "wbbbig":50,
+            "wbbbig":10,
             "etabig":10
 
         }
@@ -44,7 +44,7 @@ class RBS:
         self.volatilitychange=si.volatility_change()
     def start(self):
         self.classify([self.returns,self.volumereturns,self.wbb, self.volatilitychange])
-        print(self.groups)
+        #print(self.groups)
         clipser=Clipser(self.groups)
         clipser.start()
         decisions=clipser.return_decisions()
@@ -95,7 +95,7 @@ class RBS:
         if len(self.returns)!=len(self.volatilitychange):
             print("UWAGA DLUGOSC TABLIC JEST ROZNA ETA {} PRICES {}".format(len(self.volatilitychange),len(self.returns)))
         assert(len(self.returns)==len(self.volumereturns)==len(self.volatilitychange))
-        print(self.__dict__)
+        #print(self.__dict__)
         with open("indicators.json", "w") as write_file:
             json.dump(self.__dict__, write_file)
         #for i in range(len(self.returns)):
@@ -113,7 +113,7 @@ class RBS:
                 if self.groups[i][j]==group: 
                     k+=1
                    #print("FOUND {} GROUP IN DELTA VALUE {} : {}".format(group,self.returns[i],self.volatilitychange[i]))
-        print("{} OCCURENCES OF GROUP {}".format(k,group))
+        #print("{} OCCURENCES OF GROUP {}".format(k,group))
     def load_from_file(self):
         with open('indicators.json','r') as ifile:
             objdic=json.load(ifile)
