@@ -51,12 +51,6 @@ class RBS:
         print(decisions)
         self.dempster.take_decision(decisions)
         self.finaldecisions=self.dempster.signals
-        #for d in decisions:
-        #    self.make_decision(d)
-        #print(self.groups)
-        #print(self.returns)
-        #print(self.volumereturns)
-        #print(self.wbb)
     def classify(self,indicators):
         for i in range(len(indicators[0])):
             dayGroup=[]
@@ -86,26 +80,15 @@ class RBS:
                 dayGroup.append("ETA_Normal")
             self.groups.append(dayGroup)
     def save_rbs_obj_to_json(self):
-        #assert(len(self.returns)==len(self.volumereturns)==len(self.wbb))
-        #jsonObj=[]
-        #wbbday=len(self.returns)-len(self.wbb)
-        #j=0
-        #if len(self.returns)!=len(self.wbb):
-        #    print("UWAGA DLUGOSC TABLIC JEST ROZNA WBB {} PRICES {}".format(len(self.wbb),len(self.returns)))
+        assert(len(self.returns)==len(self.volumereturns)==len(self.wbb))
+        if len(self.returns)!=len(self.wbb):
+            print("UWAGA DLUGOSC TABLIC JEST ROZNA WBB {} PRICES {}".format(len(self.wbb),len(self.returns)))
         if len(self.returns)!=len(self.volatilitychange):
             print("UWAGA DLUGOSC TABLIC JEST ROZNA ETA {} PRICES {}".format(len(self.volatilitychange),len(self.returns)))
         assert(len(self.returns)==len(self.volumereturns)==len(self.volatilitychange))
         #print(self.__dict__)
         with open("indicators.json", "w") as write_file:
             json.dump(self.__dict__, write_file)
-        #for i in range(len(self.returns)):
-        #    dic={"pricedelta":self.returns[i], "volumedelta": self.volumereturns[i]}
-        #    if i>=wbbday:
-        #        dic["wbbdelta"]=self.wbb[j]
-        #        j+=1
-         #   jsonObj.append(dic)
-        
-        #for price in data:
     def find_in_groups(self, group):
         k=0
         for i in range(len(self.groups)):
