@@ -11,6 +11,7 @@ class SimpleIndicators:
         self.sddic={}
     def returns(self):
         deltas=[self.prices[i+1]-self.prices[i] for i in range(self.size-1)]
+        assert(len(deltas)==len(self.prices)-1)
         return deltas
     def volumereturns(self):
         deltas=[self.volumes[i+1]-self.volumes[i] for i in range(len(self.volumes)-1)]
@@ -47,3 +48,10 @@ class SimpleIndicators:
     def volatility_change(self):
         vol_change=[ ((self.low[i]+self.high[i])-(self.low[i-1]+self.high[i-1]))/2 for i in range(1,len(self.low)) ]
         return vol_change
+def wbb_pandas(stockprice,windowsize,num_of_std):
+    rolmean=stockprice.rolling(window=windowsize).mean()
+    rolstd=stockprice.rolling(window=windowsize).std()
+    rolmean=stockprice.rolling(window=windowsize).mean()
+    upband=rolmean+rolstd*num_of_std
+    lowband=rolmean-rolstd*num_of_std
+    return rolmean, upband,lowband

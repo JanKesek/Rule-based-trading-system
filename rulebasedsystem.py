@@ -16,10 +16,10 @@ class RBS:
         #self.wbb=obj['wbb']
         self.groups=[]
         self.fuzzylimits={
-            "volumebig":100,
-            "pricebig":50,
-            "wbbbig":10,
-            "etabig":10
+            "volumebig":10,
+            "pricebig":20,
+            "wbbbig":0,
+            "etabig":0
 
         }
         self.finaldecisions=[]
@@ -45,36 +45,38 @@ class RBS:
     def start(self):
         self.classify([self.returns,self.volumereturns,self.wbb, self.volatilitychange])
         #print(self.groups)
+        assert(len(self.groups)==len(self.returns))
         clipser=Clipser(self.groups)
         clipser.start()
         decisions=clipser.return_decisions()
         print(decisions)
+        self.set_fuzzy_indicators()
         self.dempster.take_decision(decisions)
         self.finaldecisions=self.dempster.signals
     def classify(self,indicators):
         for i in range(len(indicators[0])):
             dayGroup=[]
-            if indicators[0][i]>self.fuzzylimits["pricebig"]:
+            if indicators[0][i]>=self.fuzzylimits["pricebig"]:
                 dayGroup.append("Plus_Price_Big")
             elif indicators[0][i]<(self.fuzzylimits["pricebig"]*(-1)):
                 dayGroup.append("Price_MinusBig")
             else:
                 dayGroup.append("Price_Medium")
-            if indicators[1][i]>self.fuzzylimits["volumebig"]:
+            if indicators[1][i]>=self.fuzzylimits["volumebig"]:
                 dayGroup.append("Plus_Volume_Big")
             elif indicators[1][i]<(self.fuzzylimits["volumebig"]*(-1)):
                 dayGroup.append("Volume_MinusBig")
             else:
                 dayGroup.append("Volume_Medium")
-            if indicators[2][i]>(self.fuzzylimits["wbbbig"]*(-1)) and indicators[2][i]<self.fuzzylimits["wbbbig"]:
+            if indicators[2][i]>=(self.fuzzylimits["wbbbig"]*(-1)) and indicators[2][i]<self.fuzzylimits["wbbbig"]:
                 dayGroup.append("Plus_WBB_Medium")
             if indicators[2][i]>=self.fuzzylimits["wbbbig"]:
                 dayGroup.append("Plus_WBB_Big")
-            if indicators[2][i]<=(self.fuzzylimits["wbbbig"]*(-1)):
+            if indicators[2][i]<(self.fuzzylimits["wbbbig"]*(-1)):
                 dayGroup.append("Plus_WBB_Low") 
             if indicators[3][i]>=self.fuzzylimits["etabig"]:
                 dayGroup.append("Plus_ETA_Big")
-            elif indicators[3][i]<=(self.fuzzylimits["etabig"]*(-1)):
+            elif indicators[3][i]<(self.fuzzylimits["etabig"]*(-1)):
                 dayGroup.append("ETA_MinusBig")
             else:
                 dayGroup.append("ETA_Normal")
@@ -105,10 +107,16 @@ class RBS:
         self.volumereturns=objdic['volumereturns']
         self.wbb=objdic['wbb']
         self.volatilitychange=objdic['volatilitychange']
-        self.set_fuzzy_indicators()
+        #self.set_fuzzy_indicators()
     def make_decision(self,d):
         if len(d.split(' ')[1].split('_'))==2:
             demps=DempsterShaffer(d)
+    def assert_new_data(self,data):
+        try: assert(len(data)-26==len(self.returns)==len(self.volumereturns)==len(self.wbb))
+        except AssertionError as ae:
+            print(ae)
+            print("{} : {} : {} : {}".format(len(data)-25, len(self.returns),len(self.volumereturns),len(self.wbb)))
+            exit(1)
     def set_fuzzy_indicators(self):
         self.indicatorsmin={
             "price":min(self.returns),
